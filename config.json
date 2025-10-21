@@ -1,0 +1,5 @@
+{
+    "log_source": "https://ihost3.baarv.crazedns.ru/tile",
+    "refresh_interval": 30,
+    "max_entries": 8
+}

@@ -1,0 +1,8 @@
+{
+    "name": "Device Logs",
+    "version": "1.0.0",
+    "description": "Real-time device status monitoring",
+    "type": "tile",
+    "template": "custom",
+    "developer": "Your Name"
+}
