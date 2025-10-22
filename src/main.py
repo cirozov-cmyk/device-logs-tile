@@ -19,26 +19,16 @@ def index():
 def tile_endpoint():
     """Простой endpoint для плитки"""
     try:
-        # Простой HTML без сложного CSS
+        # ОЧЕНЬ ПРОСТОЙ HTML без CSS который может сломаться
         logs_html = "".join([
-            f'<div style="padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:11px;">'
-            f'<span style="opacity:0.7;font-size:10px;">{log["timestamp"]}</span> '
-            f'{log["message"]}'
-            f'</div>'
+            f'<div>{log["timestamp"]} {log["message"]}</div>'
             for log in logs[:5]
         ])
         
         tile_content = f'''
-        <div style="
-            padding:12px;
-            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-            border-radius:10px;
-            color:white;
-            height:100%;
-            font-family:Arial,sans-serif;
-        ">
-            <h3 style="margin:0 0 8px 0;font-size:14px;">📊 Журналы</h3>
-            <div style="max-height:120px;overflow-y:auto;">
+        <div>
+            <h3>📊 Журналы</h3>
+            <div>
                 {logs_html}
             </div>
         </div>
@@ -58,7 +48,7 @@ def tile_endpoint():
             "template": "custom", 
             "data": {
                 "title": "❌ Ошибка",
-                "content": f"<div style='padding:15px;color:red'>Ошибка: {str(e)}</div>",
+                "content": f"<div>Ошибка: {str(e)}</div>",
                 "refresh_interval": 60
             }
         })
@@ -77,7 +67,7 @@ def manifest():
         "name": "device-logs-tile",
         "version": "1.0.0",
         "description": "Мониторинг журналов устройств",
-        "type": "tile",
+        "type": "tile", 
         "entry": "http://localhost:8088/tile",
         "config": {
             "width": 2,
@@ -88,7 +78,7 @@ def manifest():
     })
 
 if __name__ == '__main__':
-    print("✅ Starting simple device logs tile...")
+    print("✅ Starting SUPER SIMPLE device logs tile...")
     print("📍 Port: 8080")
     print("📍 Tile endpoint: /tile")
     app.run(host='0.0.0.0', port=8080, debug=False)
