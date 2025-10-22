@@ -1,12 +1,13 @@
 {
   "name": "device-logs-tile",
   "version": "1.0.0",
-  "description": "Device logs monitoring tile",
+  "description": "Real-time device logs monitoring tile for iHost",
   "type": "tile",
   "entry": "http://localhost:8080/tile",
   "config": {
     "width": 2,
     "height": 2,
-    "title": "Device Logs"
+    "title": "Device Logs",
+    "refresh_interval": 10
   }
 }
