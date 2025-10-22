@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .device-logs-tile {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+            height: 100%;
+        }
+        .log-item {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .timestamp {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="device-logs-tile">
+        <h3>📊 Device Logs</h3>
+        <div id="logs-container">
+            <div class="log-item">
+                <span class="timestamp">Just now</span>
+                <div>Tile loaded successfully</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Загрузка логов с сервера
+        async function loadLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                const logs = await response.json();
+                updateLogsDisplay(logs);
+            } catch (error) {
+                console.error('Failed to load logs:', error);
+            }
+        }
+        
+        function updateLogsDisplay(logs) {
+            const container = document.getElementById('logs-container');
+            container.innerHTML = logs.map(log => `
+                <div class="log-item">
+                    <span class="timestamp">${log.timestamp}</span>
+                    <div>${log.message}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Обновление каждые 30 секунд
+        setInterval(loadLogs, 30000);
+        loadLogs();
+    </script>
+</body>
+</html>
