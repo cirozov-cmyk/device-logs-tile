@@ -1,8 +1,12 @@
 {
-    "name": "Device Logs",
-    "version": "1.0.0",
-    "description": "Real-time device status monitoring",
-    "type": "tile",
-    "template": "custom",
-    "developer": "Your Name"
+  "name": "device-logs-tile",
+  "version": "1.0.0",
+  "description": "Device logs monitoring tile",
+  "type": "tile",
+  "entry": "http://localhost:8080/tile",
+  "config": {
+    "width": 2,
+    "height": 2,
+    "title": "Device Logs"
+  }
 }
