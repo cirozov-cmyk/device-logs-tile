@@ -11,14 +11,35 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Show files for debugging
-      run: ls -la
-    
-    - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+    - name: Debug - Show exact file structure
+      run: |
+        echo "=== Current directory ==="
+        pwd
+        echo "=== All files ==="
+        find . -type f | sort
+        echo "=== Dockerfile check ==="
+        if [ -f "Dockerfile" ]; then
+          echo "Dockerfile FOUND!"
+          cat Dockerfile
+        else
+          echo "Dockerfile NOT FOUND!"
+          echo "Creating Dockerfile..."
+          echo "FROM python:3.9-slim" > Dockerfile
+          echo "WORKDIR /app" >> Dockerfile
+          echo "COPY requirements.txt ." >> Dockerfile
+          echo "RUN pip install --no-cache-dir -r requirements.txt" >> Dockerfile
+          echo "COPY src/ ./src/" >> Dockerfile
+          echo "COPY config.json ." >> Dockerfile
+          echo "COPY manifest.json ." >> Dockerfile
+          echo 'CMD ["python", "-m", "src.main"]' >> Dockerfile
+          echo "Dockerfile created!"
+        fi
     
     - name: Build the Docker image
       run: docker build -t cirozov/device-logs-tile:latest .
+    
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
     
     - name: Push the Docker image
       run: docker push cirozov/device-logs-tile:latest
