@@ -9,24 +9,39 @@ def index():
 
 @app.route('/tile')
 def tile():
-    """Простой endpoint для tile"""
+    """Endpoint для iHost tile"""
+    print("📨 Request received for /tile endpoint")
+    
     return jsonify({
         "template": "custom", 
         "data": {
-            "title": "Device Logs",
-            "content": "<div style='padding:20px;background:#667eea;color:white;border-radius:10px;'><h3>📊 Device Logs</h3><p>✅ Tile is working!</p></div>",
-            "refresh_interval": 30
+            "title": "📊 Device Logs",
+            "content": """
+            <div style="
+                padding: 15px; 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 10px; 
+                color: white; 
+                height: 100%;
+                font-family: Arial, sans-serif;
+            ">
+                <h3 style="margin: 0 0 10px 0;">📊 Device Logs</h3>
+                <div style="font-size: 12px;">
+                    <div>✅ Tile is working!</div>
+                    <div>🔄 Real-time monitoring</div>
+                    <div>📡 Connected to devices</div>
+                </div>
+            </div>
+            """,
+            "refresh_interval": 10
         }
     })
 
 @app.route('/health')
 def health():
-    return jsonify({"status": "healthy"})
+    return jsonify({"status": "healthy", "service": "device-logs-tile"})
 
 if __name__ == '__main__':
-    print("✅ Starting Flask server...")
-    print("📍 Port: 8080")
-    print("📍 Endpoints: /tile, /health")
-    
-    # Явно указываем host и port
-    app.run(host='0.0.0.0', port=8080, debug=False, threaded=True)
+    print("🚀 Starting Device Logs Tile...")
+    print("📍 Endpoint /tile should return JSON for iHost")
+    app.run(host='0.0.0.0', port=8080, debug=False)
