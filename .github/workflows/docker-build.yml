@@ -11,6 +11,32 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Debug - List all files
+      run: find . -type f -name "*" | sort
+    
+    - name: Create Dockerfile if missing
+      run: |
+        if [ ! -f "Dockerfile" ]; then
+          echo "Dockerfile not found! Creating it..."
+          cat > Dockerfile << 'EOF'
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ ./src/
+COPY config.json .
+COPY manifest.json .
+
+CMD ["python", "-m", "src.main"]
+EOF
+          echo "Dockerfile created successfully"
+        else
+          echo "Dockerfile exists"
+        fi
+    
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
     
