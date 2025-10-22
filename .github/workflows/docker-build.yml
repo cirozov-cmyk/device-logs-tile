@@ -28,5 +28,3 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: cirozov/device-logs-tile:latest
-        cache-from: type=registry,ref=cirozov/device-logs-tile:buildcache
-        cache-to: type=registry,ref=cirozov/device-logs-tile:buildcache,mode=max
