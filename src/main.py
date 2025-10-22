@@ -1,126 +1,94 @@
-def get_tile_html(self):
-    """Генерация HTML контента для плитки"""
-    recent_logs = self.get_recent_logs(8)
-    
-    logs_html = ""
-    for log in recent_logs:
-        icon = self.get_icon_for_type(log.get('type', 'info'))
-        source_badge = f"<span class='source {log.get('source', 'system')}'>{log.get('source', 'sys')}</span>"
+from flask import Flask, jsonify
+import time
+from datetime import datetime
+
+app = Flask(__name__)
+
+# Простое хранилище логов
+logs = [
+    {"timestamp": datetime.now().strftime("%H:%M:%S"), "message": "🚀 Плитка запущена", "type": "system"},
+    {"timestamp": datetime.now().strftime("%H:%M:%S"), "message": "✅ Система готова", "type": "success"},
+    {"timestamp": datetime.now().strftime("%H:%M:%S"), "message": "📡 Ожидание данных", "type": "info"}
+]
+
+@app.route('/')
+def index():
+    return "Device Logs Tile is running!"
+
+@app.route('/tile')
+def tile_endpoint():
+    """Простой endpoint для плитки"""
+    try:
+        # Простой HTML без сложного CSS
+        logs_html = "".join([
+            f'<div style="padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.2);font-size:11px;">'
+            f'<span style="opacity:0.7;font-size:10px;">{log["timestamp"]}</span> '
+            f'{log["message"]}'
+            f'</div>'
+            for log in logs[:5]
+        ])
         
-        logs_html += f"""
-        <div class="log-entry {log.get('type', 'info')}">
-            <div class="log-header">
-                <span class="timestamp">{log['timestamp']}</span>
-                {source_badge}
+        tile_content = f'''
+        <div style="
+            padding:12px;
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            border-radius:10px;
+            color:white;
+            height:100%;
+            font-family:Arial,sans-serif;
+        ">
+            <h3 style="margin:0 0 8px 0;font-size:14px;">📊 Журналы</h3>
+            <div style="max-height:120px;overflow-y:auto;">
+                {logs_html}
             </div>
-            <div class="message">
-                <span class="icon">{icon}</span>
-                {log['message']}
-            </div>
         </div>
-        """
-    
-    if not logs_html:
-        logs_html = '<div class="log-entry">📭 Нет данных от устройств</div>'
-    
-    last_update = self.last_update.strftime("%H:%M:%S") if self.last_update else "--:--:--"
-    
-    return f"""
-    <div class="device-logs-tile">
-        <!-- CSS_START -->
-        <style>
-            .device-logs-tile {{
-                padding: 10px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                border-radius: 12px;
-                color: white;
-                height: 100%;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                font-size: 11px;
-            }}
-            .tile-header {{
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 8px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-                padding-bottom: 6px;
-            }}
-            .tile-title {{
-                font-size: 14px;
-                font-weight: 600;
-                margin: 0;
-            }}
-            .last-update {{
-                font-size: 9px;
-                opacity: 0.7;
-            }}
-            .logs-container {{
-                max-height: 130px;
-                overflow-y: auto;
-            }}
-            .log-entry {{
-                padding: 3px 0;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            }}
-            .log-header {{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1px;
-            }}
-            .timestamp {{
-                opacity: 0.8;
-                font-size: 9px;
-            }}
-            .source {{
-                background: rgba(255, 255, 255, 0.2);
-                padding: 1px 4px;
-                border-radius: 3px;
-                font-size: 8px;
-                text-transform: uppercase;
-            }}
-            .source.node-red {{
-                background: rgba(34, 197, 94, 0.3);
-            }}
-            .source.tile {{
-                background: rgba(59, 130, 246, 0.3);
-            }}
-            .message {{
-                display: flex;
-                align-items: flex-start;
-                gap: 4px;
-                line-height: 1.2;
-            }}
-            .icon {{
-                flex-shrink: 0;
-                margin-top: 1px;
-            }}
-            .status-indicator {{
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background: #4ade80;
-                animation: pulse 2s infinite;
-            }}
-            @keyframes pulse {{
-                0% {{ opacity: 1; }}
-                50% {{ opacity: 0.5; }}
-                100% {{ opacity: 1; }}
-            }}
-        </style>
-        <!-- CSS_END -->
+        '''
         
-        <div class="tile-header">
-            <h3 class="tile-title">📊 Журналы</h3>
-            <div class="status-indicator"></div>
-        </div>
+        return jsonify({
+            "template": "custom",
+            "data": {
+                "title": "📊 Журналы",
+                "content": tile_content,
+                "refresh_interval": 30
+            }
+        })
         
-        <div class="last-update">Обновлено: {last_update}</div>
-        
-        <div class="logs-container">
-            {logs_html}
-        </div>
-    </div>
-    """
+    except Exception as e:
+        return jsonify({
+            "template": "custom", 
+            "data": {
+                "title": "❌ Ошибка",
+                "content": f"<div style='padding:15px;color:red'>Ошибка: {str(e)}</div>",
+                "refresh_interval": 60
+            }
+        })
+
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy", "timestamp": datetime.now().isoformat()})
+
+@app.route('/logs')
+def get_logs():
+    return jsonify({"logs": logs, "total": len(logs)})
+
+@app.route('/manifest.json') 
+def manifest():
+    return jsonify({
+        "name": "device-logs-tile",
+        "version": "1.0.0",
+        "description": "Мониторинг журналов устройств",
+        "type": "tile",
+        "entry": "http://localhost:8088/tile",
+        "config": {
+            "width": 2,
+            "height": 2,
+            "title": "📊 Журналы",
+            "refresh_interval": 30
+        }
+    })
+
+if __name__ == '__main__':
+    print("✅ Starting simple device logs tile...")
+    print("📍 Port: 8080")
+    print("📍 Tile endpoint: /tile")
+    app.run(host='0.0.0.0', port=8080, debug=False)
